@@ -1,7 +1,7 @@
 <?php
 // Landing veicoli — AutoIdeale.it
 // Stile chat-style mobile-first, versione 2.0
-// Invia lead a: /crm/g83/api/lead.php via POST (token: X-API-Token)
+// Invia lead a: /crm/g83/api/lead.php via POST (token: X-G83-Token)
 // Backup versione precedente: landing-veicoli-old.php
 ?>
 <!DOCTYPE html>
@@ -411,7 +411,7 @@ function caricaContatore() {
     if (!el) return;
 
     // TODO: quando GET /crm/g83/api/lead.php?action=count sarà implementato, sostituire con:
-    // fetch(API_ENDPOINT + '?action=count', { headers: { 'X-API-Token': API_TOKEN } })
+    // fetch(API_ENDPOINT + '?action=count', { headers: { 'X-G83-Token': API_TOKEN } })
     //     .then(function(r) { return r.json(); })
     //     .then(function(d) { if (d && d.count) el.textContent = d.count + ' persone'; })
     //     .catch(function() { el.textContent = '127 persone'; });
@@ -693,29 +693,25 @@ function inviaLead() {
     var nomeVal    = parti[0] || '';
     var cognomeVal = parti.slice(1).join(' ') || '';
 
-    // Note concatenate per la scheda lead nel CRM
-    var noteArr = [
-        'Tipo auto: '     + (stato.tipo_auto     || '-'),
-        'Alimentazione: ' + (stato.alimentazione || '-'),
-        'Cambio: '        + (stato.cambio        || '-'),
-        'Budget: '        + (stato.budget        || '-'),
-        'Km max: '        + (stato.km_max        || '-'),
-        'Tempistica: '    + (stato.tempistica    || '-')
-    ];
+    // Concatena le preferenze nel campo interesse
+    var interesse = [
+        'Tipo: '         + (stato.tipo_auto     || '-'),
+        'Alimentazione: '+ (stato.alimentazione || '-'),
+        'Cambio: '       + (stato.cambio        || '-'),
+        'Budget: '       + (stato.budget        || '-'),
+        'Km max: '       + (stato.km_max        || '-'),
+        'Tempistica: '   + (stato.tempistica    || '-')
+    ].join(' | ');
 
     var payload = {
-        nome:          nomeVal,
-        cognome:       cognomeVal,
-        telefono:      stato.telefono,
-        email:         stato.email,
-        tipo_auto:     stato.tipo_auto,
-        alimentazione: stato.alimentazione,
-        cambio:        stato.cambio,
-        budget:        stato.budget,
-        km_max:        stato.km_max,
-        tempistica:    stato.tempistica,
-        fonte:         'landing-chat',
-        note:          noteArr.join(' | ')
+        nome:            nomeVal,
+        cognome:         cognomeVal,
+        telefono:        stato.telefono,
+        email:           stato.email,
+        interesse:       interesse,
+        fonte:           'landing-chat',
+        id_concessionaria: 1,
+        note:            ''
     };
 
     // Feedback visivo immediato
@@ -727,7 +723,7 @@ function inviaLead() {
         method:  'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-API-Token':  API_TOKEN
+            'X-G83-Token':  API_TOKEN
         },
         body: JSON.stringify(payload)
     })

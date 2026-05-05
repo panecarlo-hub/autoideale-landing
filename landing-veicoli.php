@@ -162,23 +162,6 @@
             transition: opacity 0.3s;
         }
 
-        /* ---- Bottone WhatsApp finale ---- */
-        .wa-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #25D366;
-            color: #000;
-            font-weight: 700;
-            font-size: 17px;
-            border-radius: 20px;
-            padding: 18px 28px;
-            text-decoration: none;
-            box-shadow: 0 4px 28px rgba(37,211,102,0.32);
-            transition: transform 0.12s;
-        }
-        .wa-btn:active { transform: scale(0.96); }
-
         /* ---- Padding sicuro in fondo ---- */
         .bottom-pad { height: calc(90px + env(safe-area-inset-bottom)); }
 
@@ -262,12 +245,6 @@
 
 var API_ENDPOINT = 'https://autoideale.it/crm/g83/api/lead.php';
 var API_TOKEN    = 'G83_SECRET_2026';
-
-// TODO: sostituire con i numeri reali delle due concessionarie (prefisso internazionale senza +)
-var CONCESSIONARIE = [
-    { nome: 'Costa Auto&Gomme', wa: '393XXXXXXXXX' },
-    { nome: 'Global Cars',      wa: '393XXXXXXXXX' }
-];
 
 // ================================================================
 // DEFINIZIONE STEP CONVERSAZIONALI (9 step)
@@ -711,13 +688,9 @@ function inviaLead() {
     stato.completato = true;
     salvaStato();
 
-    // Assegna concessionaria casualmente lato client
-    // TODO: implementare round-robin lato server per distribuzione bilanciata tra le concessionarie
-    var conc = CONCESSIONARIE[Math.floor(Math.random() * CONCESSIONARIE.length)];
-
     // Separa nome e cognome (split naive sul primo spazio)
-    var parti   = (stato.nome || '').trim().split(/\s+/);
-    var nomeVal = parti[0] || '';
+    var parti      = (stato.nome || '').trim().split(/\s+/);
+    var nomeVal    = parti[0] || '';
     var cognomeVal = parti.slice(1).join(' ') || '';
 
     // Note concatenate per la scheda lead nel CRM
@@ -727,8 +700,7 @@ function inviaLead() {
         'Cambio: '        + (stato.cambio        || '-'),
         'Budget: '        + (stato.budget        || '-'),
         'Km max: '        + (stato.km_max        || '-'),
-        'Tempistica: '    + (stato.tempistica    || '-'),
-        'Concessionaria: ' + conc.nome
+        'Tempistica: '    + (stato.tempistica    || '-')
     ];
 
     var payload = {
@@ -760,14 +732,14 @@ function inviaLead() {
         body: JSON.stringify(payload)
     })
     .then(function(r) { return r.json(); })
-    .then(function() { mostraSuccesso(conc); })
-    .catch(function() { mostraSuccesso(conc); }); // Mostra successo anche in caso di errore rete
+    .then(function() { mostraSuccesso(); })
+    .catch(function() { mostraSuccesso(); }); // Mostra sempre il messaggio di conferma
 }
 
 // ================================================================
 // MESSAGGIO DI SUCCESSO FINALE
 // ================================================================
-function mostraSuccesso(conc) {
+function mostraSuccesso() {
     pulisciStato();
 
     var primoNome = stato.nome ? stato.nome.split(/\s+/)[0] : '';
@@ -775,50 +747,21 @@ function mostraSuccesso(conc) {
     setTimeout(function() {
         mostraTyping(function() {
             aggiungiBubble(
-                'Perfetto' + (primoNome ? ', <strong>' + primoNome + '</strong>' : '') + '! 🎉<br>' +
-                'La tua ricerca è stata inviata a <strong>' + conc.nome + '</strong>.<br>' +
-                'Ti contattiamo su WhatsApp <strong>entro 30 minuti</strong>.',
+                'Perfetto' + (primoNome ? ', <strong>' + primoNome + '</strong>' : '') + '! 🎉 ' +
+                'Abbiamo ricevuto la tua richiesta. Un nostro consulente ti contatterà su WhatsApp ' +
+                'al numero che ci hai lasciato <strong>entro 30 minuti</strong> per mostrarti le auto perfette per te.',
                 'sinistra',
                 function() {
-                    setTimeout(function() { mostraBottoneWA(conc); }, 500);
+                    var nota = document.createElement('div');
+                    nota.className = 'bubble-in';
+                    nota.style.cssText = 'text-align:center;padding:10px 12px 20px;font-size:12px;color:#555;';
+                    nota.textContent = 'Nel frattempo controlla che WhatsApp sia attivo sul tuo telefono.';
+                    elChat.appendChild(nota);
+                    scrollGiu();
                 }
             );
         });
     }, 600);
-}
-
-function mostraBottoneWA(conc) {
-    var tipoAuto = stato.tipo_auto || 'auto';
-    var budget   = stato.budget   ? ' • Budget: ' + stato.budget : '';
-
-    var msgWa = encodeURIComponent(
-        'Ciao! Ho appena inviato la mia ricerca su Autoideale.it. ' +
-        'Cerco: ' + tipoAuto +
-        (stato.alimentazione ? ' • ' + stato.alimentazione : '') +
-        budget +
-        '. Mi chiamo ' + (stato.nome || 'cliente') + '.'
-    );
-
-    var waUrl = 'https://wa.me/' + conc.wa + '?text=' + msgWa;
-
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'display:flex;justify-content:center;padding:20px 0 12px;';
-
-    var link = document.createElement('a');
-    link.href   = waUrl;
-    link.target = '_blank';
-    link.rel    = 'noopener noreferrer';
-    link.className = 'wa-btn bubble-in';
-    link.innerHTML =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000">' +
-        '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>' +
-        '<path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.553 4.103 1.518 5.826L.057 23.75a.5.5 0 00.614.637l6.066-1.589A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.716 9.716 0 01-4.96-1.36l-.356-.213-3.696.968 1.055-3.607-.234-.372A9.718 9.718 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>' +
-        '</svg>' +
-        'Apri WhatsApp';
-
-    wrap.appendChild(link);
-    elChat.appendChild(wrap);
-    scrollGiu();
 }
 
 // ================================================================

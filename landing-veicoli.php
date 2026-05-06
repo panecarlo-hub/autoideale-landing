@@ -1,837 +1,1083 @@
 <?php
-// Landing veicoli — AutoIdeale.it
-// Stile chat-style mobile-first, versione 2.0
-// Invia lead a: /crm/g83/api/lead.php via POST (token: X-G83-Token)
-// Backup versione precedente: landing-veicoli-old.php
-?>
-<!DOCTYPE html>
+// landing-veicoli.php — Autoideale Chat Configurator
+?><!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trova la tua auto ideale in 60 secondi | AutoIdeale.it</title>
-    <meta name="description" content="Componi la tua auto ideale rispondendo a poche domande. Ti contattiamo su WhatsApp entro 30 minuti con le migliori offerte selezionate per te.">
-    <meta property="og:title" content="Trova la tua auto ideale in 60 secondi">
-    <meta property="og:description" content="Servizio gratuito: dicci cosa cerchi, ti contattiamo su WhatsApp entro 30 minuti.">
-    <meta property="og:image" content="https://autoideale.it/images/og-chat.jpg">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://autoideale.it/landing-veicoli.php">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0a0a0a">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<!-- ===== SEO META ===== -->
+<title>Trova la tua auto o furgone ideale in 60 secondi | Autoideale</title>
+<meta name="description" content="Configura la tua auto o furgone ideale in 60 secondi con il nostro consulente AI. Berlina, SUV, furgonato, ibrida o elettrica: ricevi le migliori offerte su WhatsApp entro 30 minuti.">
+<!-- Open Graph per condivisione social -->
+<meta property="og:title" content="Trova la tua auto o furgone ideale in 60 secondi | Autoideale">
+<meta property="og:description" content="Il consulente AI che trova l'auto giusta per te. Gratis, in 60 secondi.">
+<meta property="og:image" content="https://TUODOMINIO.it/images/og-autoideale.jpg">
+<meta property="og:type" content="website">
+<meta name="robots" content="index, follow">
 
-    <!-- META PIXEL HERE -->
+<!-- META PIXEL -->
+<!--
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', 'TUO_PIXEL_ID');
+fbq('track', 'PageView');
+</script>
+-->
 
-    <!-- GOOGLE ADS TAG HERE -->
+<!-- ===== GOOGLE ADS TAG HERE ===== -->
+<!-- Sostituisci AW-XXXXXXXXX con il tuo ID Google Ads reale -->
+<!--
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-XXXXXXXXX"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'AW-XXXXXXXXX');
+</script>
+-->
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'main':  '#0a0a0a',
-                        'card':  '#1c1c1c',
-                        'bub':   '#2c2c2c',
-                        'gwa':   '#25D366',
-                        'gwad':  '#1da851',
-                        'sand':  '#E8D5B7',
-                    }
-                }
-            }
-        }
-    </script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0A0A0A;
+  --bubble-sys: #1A1A1A;
+  --green: #25D366;
+  --sand: #D4B996;
+  --text: #F5F5F0;
+  --gray2: #888;
+  --gray3: #666;
+  --blue-car: #4A7FE8;
+  --border: #1A1A1A;
+}
 
-        body {
-            background: #0a0a0a;
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, system-ui, 'Segoe UI', sans-serif;
+  height: 100%;
+  overflow-x: hidden;
+}
 
-        /* Previene zoom su input in iOS */
-        input, select, textarea { font-size: 16px !important; }
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
 
-        /* ---- Typing dots ---- */
-        .typing-dot {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #888;
-            animation: typeBounce 1.2s infinite ease-in-out;
-        }
-        .typing-dot:nth-child(2) { animation-delay: 0.18s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.36s; }
+/* ======= HEADER STICKY ======= */
+#ai-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+}
 
-        @keyframes typeBounce {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
-            30%            { transform: translateY(-5px); opacity: 1; }
-        }
+.ai-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
 
-        /* ---- Bubble in ---- */
-        @keyframes bubbleIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .bubble-in { animation: bubbleIn 0.28s ease-out forwards; }
+.ai-header-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
 
-        /* ---- Tag riepilogo ---- */
-        @keyframes tagPop {
-            from { opacity: 0; transform: scale(0.88); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-        .tag-pop { animation: tagPop 0.3s ease-out forwards; }
+.ai-brand-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
 
-        /* ---- Bottone opzione ---- */
-        .opt-btn {
-            display: block;
-            width: 100%;
-            background: #1c1c1c;
-            border: 1px solid rgba(255,255,255,0.13);
-            color: #fff;
-            border-radius: 16px;
-            padding: 16px 18px;
-            text-align: left;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.14s, border-color 0.14s, transform 0.08s;
-            font-family: inherit;
-        }
-        .opt-btn:hover  { background: rgba(37,211,102,0.1); border-color: #25D366; }
-        .opt-btn:active { transform: scale(0.97); background: rgba(37,211,102,0.16); }
+.ai-online {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--green);
+  margin-top: 2px;
+}
 
-        /* ---- Input zona fissa ---- */
-        #input-zone {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #0a0a0a;
-            border-top: 1px solid rgba(255,255,255,0.07);
-            padding: 12px 14px;
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
-            z-index: 60;
-        }
+.ai-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: ai-pulse-dot 1.8s ease-in-out infinite;
+}
 
-        .chat-input-field {
-            flex: 1;
-            background: #1c1c1c;
-            border: 1px solid rgba(255,255,255,0.14);
-            border-radius: 24px;
-            padding: 12px 18px;
-            color: #fff;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .chat-input-field:focus   { border-color: #25D366; }
-        .chat-input-field::placeholder { color: rgba(255,255,255,0.3); }
+.ai-header-left {
+  display: flex;
+  align-items: center;
+}
 
-        .send-btn {
-            background: #25D366;
-            border: none;
-            border-radius: 50%;
-            width: 46px;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: transform 0.1s;
-        }
-        .send-btn:active { transform: scale(0.9); }
+.ai-header-right {
+  text-align: right;
+}
 
-        /* ---- Header ---- */
-        .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 70;
-            background: #111;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-        }
+.ai-header-right .count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+}
 
-        /* ---- Card riepilogo ---- */
-        #summary-card {
-            background: #111;
-            border: 1px solid rgba(232,213,183,0.2);
-            transition: opacity 0.3s;
-        }
+.ai-header-right .label {
+  font-size: 10px;
+  color: var(--gray2);
+  display: block;
+}
 
-        /* ---- Padding sicuro in fondo ---- */
-        .bottom-pad { height: calc(90px + env(safe-area-inset-bottom)); }
+/* ======= STATUS BAR ======= */
+#ai-statusbar {
+  position: sticky;
+  top: 61px;
+  z-index: 99;
+  background: #0F0F0F;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-        /* ---- Scrollbar chat ---- */
-        #chat-area::-webkit-scrollbar { width: 3px; }
-        #chat-area::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-    </style>
+.ai-status-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.ai-status-left .pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: ai-pulse-dot 1.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.ai-status-left .count-num {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ai-status-left .count-label {
+  color: #999;
+}
+
+.ai-status-right {
+  font-size: 10px;
+  color: var(--gray3);
+}
+
+/* ======= CARD AUTO LIVE ======= */
+#ai-card-live {
+  background: var(--bg);
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-card-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--sand);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.ai-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 24px;
+  margin-bottom: 12px;
+}
+
+.ai-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--green);
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 100px;
+  animation: ai-fadein-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.ai-car-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 4px;
+}
+
+.ai-car-glow {
+  position: absolute;
+  width: 240px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(74,127,232,0.4) 0%, transparent 70%);
+  animation: ai-pulse-glow 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ai-car-svg {
+  animation: ai-float-car 3.5s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+/* ======= CHAT AREA ======= */
+#ai-chat {
+  flex: 1;
+  padding: 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.ai-bubble {
+  max-width: 85%;
+  padding: 11px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 10px;
+  animation: ai-fadein-up 0.3s ease forwards;
+}
+
+.ai-bubble.system {
+  background: var(--bubble-sys);
+  border-radius: 4px 16px 16px 16px;
+  align-self: flex-start;
+}
+
+.ai-bubble.user {
+  background: var(--green);
+  color: #000;
+  font-weight: 600;
+  border-radius: 16px 4px 16px 16px;
+  align-self: flex-end;
+}
+
+.ai-typing {
+  background: var(--bubble-sys);
+  border-radius: 4px 16px 16px 16px;
+  padding: 11px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  animation: ai-fadein-up 0.3s ease forwards;
+}
+
+.ai-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gray2);
+  display: inline-block;
+  animation: ai-typing-bounce 1.2s ease-in-out infinite;
+}
+
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ======= BOTTONI OPZIONI ======= */
+#ai-options {
+  padding: 8px 14px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  animation: ai-fadein-up 0.3s ease forwards;
+}
+
+.ai-option-btn {
+  background: transparent;
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  padding: 14px 20px;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 52px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  flex: 1 1 calc(50% - 4px);
+  min-width: 120px;
+  line-height: 1.2;
+}
+
+.ai-option-btn:active,
+.ai-option-btn:hover {
+  background: var(--green);
+  color: #000;
+}
+
+/* ======= INPUT TESTO ======= */
+.ai-input-wrap {
+  padding: 8px 14px 12px;
+  animation: ai-fadein-up 0.3s ease forwards;
+}
+
+.ai-input-field {
+  width: 100%;
+  font-size: 16px;
+  padding: 14px 16px;
+  background: var(--bubble-sys);
+  color: var(--text);
+  border: 1px solid #2A2A2A;
+  border-radius: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+
+.ai-input-field:focus {
+  border-color: var(--green);
+}
+
+.ai-input-field::placeholder {
+  color: var(--gray3);
+}
+
+.ai-send-btn {
+  width: 100%;
+  margin-top: 10px;
+  background: var(--green);
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.ai-send-btn:active { opacity: 0.85; }
+
+.ai-skip-btn {
+  width: 100%;
+  margin-top: 8px;
+  background: transparent;
+  color: var(--gray2);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #2A2A2A;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ======= PRIVACY ======= */
+.ai-privacy-wrap {
+  padding: 8px 14px 12px;
+  animation: ai-fadein-up 0.3s ease forwards;
+}
+
+.ai-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--gray2);
+  line-height: 1.5;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.ai-checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green);
+  flex-shrink: 0;
+  margin-top: 1px;
+  cursor: pointer;
+}
+
+.ai-checkbox-label a {
+  color: var(--sand);
+  text-decoration: underline;
+}
+
+/* ======= PROGRESS BAR ======= */
+#ai-progress {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 10px 18px 14px;
+}
+
+.ai-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ai-progress-label {
+  font-size: 10px;
+  color: var(--gray3);
+}
+
+.ai-progress-pct {
+  font-size: 10px;
+  color: var(--gray3);
+}
+
+.ai-progress-track {
+  height: 3px;
+  background: #1F1F1F;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.ai-progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 100px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* ======= MESSAGGIO FINALE ======= */
+.ai-final-msg {
+  font-size: 13px;
+  color: var(--gray2);
+  text-align: center;
+  padding: 8px 14px 0;
+  animation: ai-fadein-up 0.3s ease forwards;
+}
+
+/* ======= ANIMAZIONI ======= */
+@keyframes ai-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+@keyframes ai-float-car {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes ai-pulse-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+@keyframes ai-fadein-pop {
+  0% { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ai-fadein-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ai-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+@media (max-width: 400px) {
+  .ai-option-btn {
+    flex: 1 1 100%;
+  }
+}
+</style>
 </head>
 <body>
 
-<!-- ============================================================
-     HEADER STICKY
-     ============================================================ -->
-<div class="app-header">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
-
-        <!-- Brand -->
-        <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:38px;height:38px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:15px;flex-shrink:0;">AI</div>
-            <div>
-                <div style="font-weight:700;font-size:15px;line-height:1.1;color:#fff;">Autoideale</div>
-                <div style="font-size:11px;color:#25D366;">&#9679; Online</div>
-            </div>
-        </div>
-
-        <!-- Contatore live -->
-        <div style="text-align:right;">
-            <div id="counter-num" style="font-size:13px;font-weight:600;color:#E8D5B7;">&#8203;</div>
-            <div style="font-size:10px;color:#666;">hanno trovato la loro auto</div>
-        </div>
-
+<!-- HEADER STICKY -->
+<header id="ai-header">
+  <div class="ai-header-left">
+    <div class="ai-avatar">AI</div>
+    <div class="ai-header-info">
+      <span class="ai-brand-name">Autoideale</span>
+      <span class="ai-online">
+        <span class="ai-pulse-dot"></span>
+        Online
+      </span>
     </div>
+  </div>
+  <div class="ai-header-right">
+    <span class="count">127 persone</span>
+    <span class="label">hanno trovato la loro auto</span>
+  </div>
+</header>
+
+<!-- STATUS BAR -->
+<div id="ai-statusbar">
+  <div class="ai-status-left">
+    <span class="pulse-dot"></span>
+    <span class="count-num">247</span>
+    <span class="count-label">auto disponibili</span>
+  </div>
+  <div class="ai-status-right">ultimo brief · pochi minuti fa</div>
 </div>
 
-<!-- ============================================================
-     CARD RIEPILOGO LIVE (appare dopo la prima risposta)
-     ============================================================ -->
-<div id="summary-card" class="hidden" style="margin:8px 12px 0;border-radius:16px;padding:10px 14px;">
-    <div style="font-size:10px;font-weight:700;color:#E8D5B7;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">La tua auto ideale</div>
-    <div id="summary-tags" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+<!-- CARD AUTO LIVE -->
+<div id="ai-card-live">
+  <div class="ai-card-label">La tua auto, in tempo reale</div>
+  <div class="ai-chips-container" id="ai-chips"></div>
+  <div class="ai-car-wrap">
+    <div class="ai-car-glow"></div>
+    <svg class="ai-car-svg" width="270" height="98" viewBox="0 0 270 98" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Ombra ellittica -->
+      <ellipse cx="135" cy="90" rx="105" ry="7" fill="rgba(0,0,0,0.45)"/>
+      <!-- Carrozzeria principale -->
+      <path d="M28 68 Q28 58 38 56 L68 46 Q88 30 120 27 L160 26 Q188 26 204 36 L230 50 Q242 54 244 62 L244 68 Z" fill="#3A6FD8"/>
+      <!-- Tetto / cabina -->
+      <path d="M74 56 Q90 34 118 30 L158 29 Q184 29 200 40 L226 54 Z" fill="#4A7FE8"/>
+      <!-- Highlights tetto -->
+      <path d="M82 52 Q96 37 118 34 L155 33 Q178 34 196 44 L218 52 Z" fill="rgba(255,255,255,0.08)"/>
+      <!-- Parabrezza anteriore -->
+      <path d="M180 54 L202 42 Q212 38 226 50 L222 54 Z" fill="#1A2E5A" opacity="0.85"/>
+      <!-- Parabrezza posteriore -->
+      <path d="M82 54 L94 36 Q100 30 120 29 L74 54 Z" fill="#1A2E5A" opacity="0.85"/>
+      <!-- Finestrino laterale -->
+      <path d="M100 54 L106 36 L152 34 L158 54 Z" fill="#1A2E5A" opacity="0.75"/>
+      <!-- Fanale anteriore giallo -->
+      <ellipse cx="238" cy="60" rx="8" ry="5" fill="#F5C842"/>
+      <ellipse cx="238" cy="60" rx="5" ry="3" fill="#FFE070"/>
+      <!-- Fanale posteriore rosso -->
+      <ellipse cx="32" cy="60" rx="7" ry="4.5" fill="#CC3333"/>
+      <ellipse cx="32" cy="60" rx="4" ry="2.5" fill="#FF5555"/>
+      <!-- Linea laterale accento -->
+      <path d="M38 62 L240 62" stroke="rgba(74,127,232,0.5)" stroke-width="1"/>
+      <!-- Minigonna -->
+      <path d="M50 68 L220 68 L220 72 Q135 75 50 72 Z" fill="#2A5CB8"/>
+      <!-- Ruota anteriore -->
+      <circle cx="196" cy="74" r="16" fill="#141414"/>
+      <circle cx="196" cy="74" r="12" fill="#222"/>
+      <circle cx="196" cy="74" r="7" fill="#333"/>
+      <circle cx="196" cy="74" r="4" fill="#555"/>
+      <!-- Raggi ruota ant -->
+      <line x1="196" y1="62" x2="196" y2="86" stroke="#444" stroke-width="1.5"/>
+      <line x1="184" y1="74" x2="208" y2="74" stroke="#444" stroke-width="1.5"/>
+      <line x1="187.5" y1="65.5" x2="204.5" y2="82.5" stroke="#444" stroke-width="1.5"/>
+      <line x1="187.5" y1="82.5" x2="204.5" y2="65.5" stroke="#444" stroke-width="1.5"/>
+      <!-- Ruota posteriore -->
+      <circle cx="74" cy="74" r="16" fill="#141414"/>
+      <circle cx="74" cy="74" r="12" fill="#222"/>
+      <circle cx="74" cy="74" r="7" fill="#333"/>
+      <circle cx="74" cy="74" r="4" fill="#555"/>
+      <!-- Raggi ruota post -->
+      <line x1="74" y1="62" x2="74" y2="86" stroke="#444" stroke-width="1.5"/>
+      <line x1="62" y1="74" x2="86" y2="74" stroke="#444" stroke-width="1.5"/>
+      <line x1="65.5" y1="65.5" x2="82.5" y2="82.5" stroke="#444" stroke-width="1.5"/>
+      <line x1="65.5" y1="82.5" x2="82.5" y2="65.5" stroke="#444" stroke-width="1.5"/>
+    </svg>
+  </div>
 </div>
 
-<!-- ============================================================
-     AREA CHAT
-     ============================================================ -->
-<div id="chat-area" style="display:flex;flex-direction:column;gap:10px;padding:14px 12px;">
-    <!-- messaggi inseriti dinamicamente via JS -->
-</div>
+<!-- CHAT AREA -->
+<div id="ai-chat"></div>
 
-<!-- Padding per non nascondere l'ultimo messaggio dietro la zona input -->
-<div class="bottom-pad"></div>
+<!-- OPTIONS / INPUT AREA (dynamic) -->
+<div id="ai-interact"></div>
 
-<!-- ============================================================
-     ZONA INPUT FISSA (visibile solo per step testo)
-     ============================================================ -->
-<div id="input-zone" style="display:none;">
-    <div style="display:flex;gap:10px;align-items:center;max-width:520px;margin:0 auto;">
-        <input
-            type="text"
-            id="chat-input"
-            class="chat-input-field"
-            placeholder=""
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="words"
-        >
-        <button class="send-btn" onclick="handleSend()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000">
-                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"/>
-            </svg>
-        </button>
-    </div>
-    <div id="input-error" style="display:none;color:#f87171;font-size:12px;text-align:center;margin-top:6px;max-width:520px;margin-left:auto;margin-right:auto;padding:0 4px;"></div>
-    <div id="optional-hint" style="display:none;color:#555;font-size:11px;text-align:center;margin-top:4px;">Facoltativo — puoi premere Invia per saltare</div>
+<!-- PROGRESS BAR -->
+<div id="ai-progress">
+  <div class="ai-progress-row">
+    <span class="ai-progress-label" id="ai-step-label">Brief 0 di 9</span>
+    <span class="ai-progress-pct" id="ai-step-pct">0%</span>
+  </div>
+  <div class="ai-progress-track">
+    <div class="ai-progress-fill" id="ai-progress-fill"></div>
+  </div>
 </div>
 
 <script>
-// ================================================================
-// CONFIGURAZIONE
-// ================================================================
+(function() {
 
-var API_ENDPOINT = 'https://autoideale.it/crm/g83/api/lead.php';
-var API_TOKEN    = 'G83_SECRET_2026';
+  // ─── STATE ───────────────────────────────────────────────────
+  const LS_KEY = 'ai_brief_v3';
+  let state = {
+    step: 0,
+    answers: {},
+    chips: [],
+    done: false
+  };
 
-// ================================================================
-// DEFINIZIONE STEP CONVERSAZIONALI (9 step)
-// ================================================================
-var STEPS = [
-    {
-        id:      'tipo_auto',
-        domanda: 'Ciao! Che tipo di auto cerchi?',
-        tipo:    'bottoni',
-        opzioni: [
-            { testo: '🚗 Berlina',         val: 'Berlina' },
-            { testo: '🚙 SUV',              val: 'SUV' },
-            { testo: '🚐 Station Wagon',    val: 'Station Wagon' },
-            { testo: '🏙️ City Car',   val: 'City Car' },
-            { testo: '🏎️ Coupé', val: 'Coupé' },
-            { testo: '🤷 Indifferente',     val: 'Indifferente' }
-        ]
-    },
-    {
-        id:      'alimentazione',
-        domanda: 'Alimentazione preferita?',
-        tipo:    'bottoni',
-        opzioni: [
-            { testo: '⛽ Benzina',        val: 'Benzina' },
-            { testo: '💧 Diesel',   val: 'Diesel' },
-            { testo: '🔋 Ibrida',   val: 'Ibrida' },
-            { testo: '⚡ Elettrica',      val: 'Elettrica' },
-            { testo: '🤷 Indifferente', val: 'Indifferente' }
-        ]
-    },
-    {
-        id:      'cambio',
-        domanda: 'Tipo di cambio?',
-        tipo:    'bottoni',
-        opzioni: [
-            { testo: '🔧 Manuale',         val: 'Manuale' },
-            { testo: '🤖 Automatico',      val: 'Automatico' },
-            { testo: '🤷 Indifferente',    val: 'Indifferente' }
-        ]
-    },
-    {
-        id:      'budget',
-        domanda: 'Qual è il tuo budget?',
-        tipo:    'bottoni',
-        opzioni: [
-            { testo: '💶 Fino a 10.000€',  val: 'Fino a 10.000€' },
-            { testo: '💶 10−20.000€',  val: '10-20.000€' },
-            { testo: '💶 20−30.000€',  val: '20-30.000€' },
-            { testo: '💶 Oltre 30.000€',    val: 'Oltre 30.000€' }
-        ]
-    },
-    {
-        id:      'km_max',
-        domanda: 'Km massimi?',
-        tipo:    'bottoni',
-        opzioni: [
-            { testo: '📍 Fino a 50.000',   val: 'Fino a 50.000 km' },
-            { testo: '📍 50–100.000', val: '50-100.000 km' },
-            { testo: '📍 100–150.000',val: '100-150.000 km' },
-            { testo: '🤷 Indifferente',    val: 'Indifferente' }
-        ]
-    },
-    {
-        id:      'tempistica',
-        domanda: 'Quando vorresti l\'auto?',
-        tipo:    'bottoni',
-        opzioni: [
-            { testo: '🔥 Subito',                   val: 'Subito' },
-            { testo: '📅 Entro 1 mese',             val: 'Entro 1 mese' },
-            { testo: '📅 Entro 3 mesi',             val: 'Entro 3 mesi' },
-            { testo: '👁️ Sto solo guardando', val: 'Sto solo guardando' }
-        ]
-    },
-    {
-        id:           'nome',
-        domanda:      'Come ti chiami?',
-        tipo:         'input',
-        placeholder:  'Nome e cognome',
-        inputType:    'text',
-        obbligatorio: true
-    },
-    {
-        id:           'telefono',
-        domanda:      'Il tuo numero WhatsApp?',
-        tipo:         'input',
-        placeholder:  'Es. 3391234567',
-        inputType:    'tel',
-        obbligatorio: true
-    },
-    {
-        id:           'email',
-        domanda:      'Email? Ti mandiamo anche un riepilogo. (opzionale)',
-        tipo:         'input',
-        placeholder:  'La tua email',
-        inputType:    'email',
-        obbligatorio: false
+  // Try restore from localStorage
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (!parsed.done) state = parsed;
     }
-];
+  } catch(e) {}
 
-// Icone per i tag del riepilogo live
-var TAG_ICONS = {
-    tipo_auto:     '🚗',
-    alimentazione: '⛽',
-    cambio:        '⚙️',
-    budget:        '💶',
-    km_max:        '📍',
-    tempistica:    '🕒'
-};
+  function saveState() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+  }
 
-// ================================================================
-// STATO APPLICAZIONE
-// ================================================================
-var stato = {
-    step:          0,
-    nome:          '',
-    cognome:       '',
-    telefono:      '',
-    email:         '',
-    tipo_auto:     '',
-    alimentazione: '',
-    cambio:        '',
-    budget:        '',
-    km_max:        '',
-    tempistica:    '',
-    completato:    false
-};
+  // ─── ELEMENTS ────────────────────────────────────────────────
+  const chatEl = document.getElementById('ai-chat');
+  const interactEl = document.getElementById('ai-interact');
+  const chipsEl = document.getElementById('ai-chips');
+  const progressFill = document.getElementById('ai-progress-fill');
+  const stepLabel = document.getElementById('ai-step-label');
+  const stepPct = document.getElementById('ai-step-pct');
 
-// ================================================================
-// RIFERIMENTI DOM
-// ================================================================
-var elChat      = document.getElementById('chat-area');
-var elInputZone = document.getElementById('input-zone');
-var elInput     = document.getElementById('chat-input');
-var elInputErr  = document.getElementById('input-error');
-var elOptHint   = document.getElementById('optional-hint');
-var elSummary   = document.getElementById('summary-card');
-var elTags      = document.getElementById('summary-tags');
+  // ─── PROGRESS ────────────────────────────────────────────────
+  const TOTAL_STEPS = 9;
 
-// ================================================================
-// LOCALSTORAGE — salvataggio progressi
-// ================================================================
-var LS_KEY = 'autoideale_chat_v2';
+  function updateProgress(step) {
+    const pct = Math.round((step / TOTAL_STEPS) * 100);
+    progressFill.style.width = pct + '%';
+    stepLabel.textContent = 'Brief ' + step + ' di ' + TOTAL_STEPS;
+    stepPct.textContent = pct + '%';
+  }
 
-function salvaStato() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(stato)); } catch(e) {}
-}
+  // ─── CHIPS ───────────────────────────────────────────────────
+  function addChip(text) {
+    state.chips.push(text);
+    const chip = document.createElement('span');
+    chip.className = 'ai-chip';
+    chip.textContent = text;
+    chipsEl.appendChild(chip);
+  }
 
-function caricaStato() {
-    try {
-        var s = localStorage.getItem(LS_KEY);
-        return s ? JSON.parse(s) : null;
-    } catch(e) { return null; }
-}
-
-function pulisciStato() {
-    try { localStorage.removeItem(LS_KEY); } catch(e) {}
-}
-
-// ================================================================
-// CONTATORE LIVE
-// ================================================================
-function caricaContatore() {
-    var el = document.getElementById('counter-num');
-    if (!el) return;
-
-    // TODO: quando GET /crm/g83/api/lead.php?action=count sarà implementato, sostituire con:
-    // fetch(API_ENDPOINT + '?action=count', { headers: { 'X-G83-Token': API_TOKEN } })
-    //     .then(function(r) { return r.json(); })
-    //     .then(function(d) { if (d && d.count) el.textContent = d.count + ' persone'; })
-    //     .catch(function() { el.textContent = '127 persone'; });
-    // Fallback statico in attesa dell'endpoint:
-    el.textContent = '127 persone';
-}
-
-// ================================================================
-// SCROLL AUTOMATICO
-// ================================================================
-function scrollGiu() {
-    setTimeout(function() {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 60);
-}
-
-// ================================================================
-// BUBBLE CHAT
-// ================================================================
-function aggiungiBubble(html, lato, callback) {
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'display:flex;' + (lato === 'destra' ? 'justify-content:flex-end;' : 'justify-content:flex-start;');
-
-    var bub = document.createElement('div');
-    bub.className = 'bubble-in';
-    bub.style.cssText =
-        'max-width:82%;padding:11px 15px;border-radius:18px;font-size:14px;line-height:1.55;' +
-        (lato === 'destra'
-            ? 'background:#25D366;color:#000;font-weight:600;border-bottom-right-radius:4px;'
-            : 'background:#2c2c2c;color:#fff;border-bottom-left-radius:4px;');
-    bub.innerHTML = html;
-
-    wrap.appendChild(bub);
-    elChat.appendChild(wrap);
-    scrollGiu();
-
-    if (callback) setTimeout(callback, 280);
-}
-
-// ================================================================
-// TYPING INDICATOR (puntini per 800ms poi callback)
-// ================================================================
-function mostraTyping(callback) {
-    var wrap = document.createElement('div');
-    wrap.id = 'typing-wrap';
-    wrap.style.cssText = 'display:flex;justify-content:flex-start;';
-
-    var bub = document.createElement('div');
-    bub.style.cssText = 'background:#2c2c2c;padding:12px 15px;border-radius:18px;border-bottom-left-radius:4px;display:flex;gap:4px;align-items:center;';
-    bub.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-
-    wrap.appendChild(bub);
-    elChat.appendChild(wrap);
-    scrollGiu();
-
-    setTimeout(function() {
-        var el = document.getElementById('typing-wrap');
-        if (el) el.remove();
-        if (callback) callback();
-    }, 820);
-}
-
-// ================================================================
-// BOTTONI OPZIONE
-// ================================================================
-function mostraBottoni(step) {
-    rimuoviBottoni();
-
-    var wrap = document.createElement('div');
-    wrap.id = 'opt-wrap';
-    wrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:4px;padding-bottom:12px;';
-
-    step.opzioni.forEach(function(opt) {
-        var btn = document.createElement('button');
-        btn.className = 'opt-btn';
-        btn.textContent = opt.testo;
-        btn.onclick = function() { gestisciSelezione(step, opt.val, opt.testo); };
-        wrap.appendChild(btn);
+  function renderChips() {
+    chipsEl.innerHTML = '';
+    state.chips.forEach(function(c) {
+      const chip = document.createElement('span');
+      chip.className = 'ai-chip';
+      chip.style.animationDuration = '0ms';
+      chip.textContent = c;
+      chipsEl.appendChild(chip);
     });
+  }
 
-    elChat.appendChild(wrap);
-    scrollGiu();
-}
+  // ─── TYPING + BUBBLE ─────────────────────────────────────────
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'ai-typing';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    chatEl.appendChild(el);
+    scrollChat();
+    return el;
+  }
 
-function rimuoviBottoni() {
-    var el = document.getElementById('opt-wrap');
-    if (el) el.remove();
-}
+  function addBubble(text, type, delay) {
+    return new Promise(function(resolve) {
+      const typing = showTyping();
+      setTimeout(function() {
+        typing.remove();
+        const bubble = document.createElement('div');
+        bubble.className = 'ai-bubble ' + (type || 'system');
+        bubble.innerHTML = text;
+        chatEl.appendChild(bubble);
+        scrollChat();
+        resolve();
+      }, delay || 800);
+    });
+  }
 
-function gestisciSelezione(step, valore, testoVisibile) {
-    rimuoviBottoni();
-    stato[step.id] = valore;
-    salvaStato();
-    aggiungiBubble(testoVisibile, 'destra');
-    aggiornaRiepilogo();
-    setTimeout(avanziStep, 420);
-}
+  function addUserBubble(text) {
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-bubble user';
+    bubble.textContent = text;
+    chatEl.appendChild(bubble);
+    scrollChat();
+  }
 
-// ================================================================
-// INPUT TESTO
-// ================================================================
-function mostraInput(step) {
-    elInput.value       = '';
-    elInput.placeholder = step.placeholder || '';
-    elInput.type        = step.inputType || 'text';
-    elInputErr.style.display  = 'none';
-    elOptHint.style.display   = step.obbligatorio === false ? 'block' : 'none';
-    elInputZone.style.display = 'block';
+  function scrollChat() {
+    requestAnimationFrame(function() {
+      chatEl.scrollTop = chatEl.scrollHeight;
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+  }
 
-    elInput.onkeydown = function(e) {
-        if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
+  // ─── RENDER OPZIONI ──────────────────────────────────────────
+  function renderOptions(options, onSelect) {
+    interactEl.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.id = 'ai-options';
+    options.forEach(function(opt) {
+      const btn = document.createElement('button');
+      btn.className = 'ai-option-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', function() {
+        interactEl.innerHTML = '';
+        onSelect(opt);
+      });
+      wrap.appendChild(btn);
+    });
+    interactEl.appendChild(wrap);
+    scrollChat();
+  }
+
+  function renderInput(type, placeholder, onSubmit, skipLabel) {
+    interactEl.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'ai-input-wrap';
+
+    const input = document.createElement('input');
+    input.type = type || 'text';
+    input.placeholder = placeholder || '';
+    input.className = 'ai-input-field';
+    input.autocomplete = type === 'tel' ? 'tel' : type === 'email' ? 'email' : 'name';
+    wrap.appendChild(input);
+
+    const btn = document.createElement('button');
+    btn.className = 'ai-send-btn';
+    btn.textContent = 'Continua →';
+    btn.addEventListener('click', function() {
+      const val = input.value.trim();
+      if (onSubmit(val)) {
+        interactEl.innerHTML = '';
+      }
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btn.click();
+    });
+    wrap.appendChild(btn);
+
+    if (skipLabel) {
+      const skip = document.createElement('button');
+      skip.className = 'ai-skip-btn';
+      skip.textContent = 'Salta →';
+      skip.addEventListener('click', function() {
+        interactEl.innerHTML = '';
+        onSubmit('');
+      });
+      wrap.appendChild(skip);
+    }
+
+    interactEl.appendChild(wrap);
+    setTimeout(function() { input.focus(); }, 300);
+    scrollChat();
+  }
+
+  function renderPrivacy(onConfirm) {
+    interactEl.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'ai-privacy-wrap';
+
+    const label = document.createElement('label');
+    label.className = 'ai-checkbox-label';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+
+    const txt = document.createElement('span');
+    txt.innerHTML = 'Ho letto e accetto la <a href="privacy-policy.php" target="_blank">Privacy Policy</a>. Acconsento al trattamento dei dati personali per essere contattato da Autoideale.';
+
+    label.appendChild(cb);
+    label.appendChild(txt);
+    wrap.appendChild(label);
+
+    const btn = document.createElement('button');
+    btn.className = 'ai-send-btn';
+    btn.textContent = 'Invia richiesta ✓';
+    btn.addEventListener('click', function() {
+      if (!cb.checked) {
+        cb.style.outline = '2px solid red';
+        setTimeout(function() { cb.style.outline = ''; }, 1500);
+        return;
+      }
+      interactEl.innerHTML = '';
+      onConfirm();
+    });
+    wrap.appendChild(btn);
+    interactEl.appendChild(wrap);
+    scrollChat();
+  }
+
+  // ─── CRM SUBMIT ──────────────────────────────────────────────
+  function submitCRM() {
+    const a = state.answers;
+    const tipo = a.tipo || '';
+    const sottotipo = a.sottotipo || '';
+    const alimentazione = a.alimentazione || '';
+    const cambio = a.cambio || '';
+    const budget = a.budget || '';
+    const km = a.km || '';
+    const tempistica = a.tempistica || '';
+
+    const interesse = [
+      'Tipo: ' + tipo + (sottotipo ? ' - ' + sottotipo : ''),
+      'Alimentazione: ' + alimentazione,
+      'Cambio: ' + cambio,
+      'Budget: ' + budget,
+      'Km: ' + km,
+      'Tempistica: ' + tempistica
+    ].filter(function(s) { return !s.endsWith(': '); }).join(' | ');
+
+    const payload = {
+      nome: a.nome || '',
+      telefono: a.telefono || '',
+      email: a.email || '',
+      interesse: interesse,
+      fonte: 'landing-chat',
+      id_concessionaria: 1,
+      note: ''
     };
 
-    setTimeout(function() { elInput.focus(); }, 350);
-}
+    fetch('/crm/g83/api/lead.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-G83-Token': 'G83_SECRET_2026'
+      },
+      body: JSON.stringify(payload)
+    }).catch(function() {});
+  }
 
-function nascondiInput() {
-    elInputZone.style.display = 'none';
-    elInput.blur();
-}
+  // ─── STEPS ───────────────────────────────────────────────────
+  async function runIntro() {
+    await addBubble('Ciao! 👋 Sono il tuo consulente auto virtuale di Autoideale.', 'system', 900);
+    await addBubble('Ti aiuto a trovare la tua auto ideale in meno di 60 secondi, gratis.', 'system', 700);
+    await runStep1();
+  }
 
-function handleSend() {
-    var step      = STEPS[stato.step];
-    var val       = elInput.value.trim();
-    var facoltativo = (step.obbligatorio === false);
-
-    if (!facoltativo && !val) {
-        mostraErroreInput('Inserisci un valore per continuare.');
-        return;
-    }
-
-    // Validazione telefono (9-11 cifre, formato italiano)
-    if (step.id === 'telefono' && val) {
-        var cifre = val.replace(/\D/g, '');
-        if (cifre.length < 9 || cifre.length > 11) {
-            mostraErroreInput('Numero non valido. Usa il formato 3391234567.');
-            return;
-        }
-        val = cifre;
-    }
-
-    // Validazione email
-    if (step.id === 'email' && val) {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-            mostraErroreInput('Email non valida.');
-            return;
-        }
-    }
-
-    nascondiInput();
-    stato[step.id] = val;
-    salvaStato();
-
-    aggiungiBubble(val || '(salto)', 'destra');
-    aggiornaRiepilogo();
-    setTimeout(avanziStep, 420);
-}
-
-function mostraErroreInput(msg) {
-    elInputErr.textContent   = msg;
-    elInputErr.style.display = 'block';
-    setTimeout(function() { elInputErr.style.display = 'none'; }, 3000);
-}
-
-// ================================================================
-// RIEPILOGO LIVE — si aggiorna dopo ogni risposta
-// ================================================================
-function aggiornaRiepilogo() {
-    var campi = ['tipo_auto', 'alimentazione', 'cambio', 'budget', 'km_max', 'tempistica'];
-    var html  = '';
-    var trovato = false;
-
-    campi.forEach(function(k) {
-        if (stato[k]) {
-            trovato = true;
-            html += '<span class="tag-pop" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.09);border-radius:20px;padding:4px 10px;font-size:12px;color:#fff;">' +
-                (TAG_ICONS[k] || '') + ' ' + stato[k] + '</span>';
-        }
+  async function runStep1() {
+    updateProgress(1);
+    await addBubble('Cosa stai cercando?', 'system', 600);
+    renderOptions(['Auto', 'Furgone'], function(val) {
+      addUserBubble(val);
+      state.answers.tipo = val;
+      addChip(val);
+      saveState();
+      if (val === 'Auto') runStep2A();
+      else runStep2B();
     });
+  }
 
-    if (trovato) {
-        elSummary.classList.remove('hidden');
-        elTags.innerHTML = html;
-    }
-}
-
-// ================================================================
-// AVANZAMENTO STEP
-// ================================================================
-function avanziStep() {
-    stato.step++;
-    salvaStato();
-
-    if (stato.step < STEPS.length) {
-        eseguiStep(stato.step);
-    } else {
-        mostraStepPrivacy();
-    }
-}
-
-function eseguiStep(idx) {
-    var step = STEPS[idx];
-
-    mostraTyping(function() {
-        aggiungiBubble(step.domanda, 'sinistra', function() {
-            if (step.tipo === 'bottoni') {
-                mostraBottoni(step);
-            } else {
-                mostraInput(step);
-            }
-        });
+  async function runStep2A() {
+    updateProgress(2);
+    await addBubble('Che tipo di auto?', 'system', 600);
+    renderOptions(['Berlina', 'SUV', 'Station Wagon', 'City Car', 'Coupé', 'Indifferente'], function(val) {
+      addUserBubble(val);
+      state.answers.sottotipo = val;
+      if (val !== 'Indifferente') addChip(val);
+      saveState();
+      runStep3();
     });
-}
+  }
 
-// ================================================================
-// STEP PRIVACY (dopo lo step 9)
-// ================================================================
-function mostraStepPrivacy() {
-    rimuoviBottoni();
-    nascondiInput();
-
-    mostraTyping(function() {
-        aggiungiBubble(
-            'Quasi fatto! Prima di inviarti le offerte, ho bisogno del tuo consenso.',
-            'sinistra',
-            function() {
-                var wrap = document.createElement('div');
-                wrap.id = 'opt-wrap';
-                wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin-top:4px;padding-bottom:20px;';
-
-                // Label checkbox privacy
-                var lbl = document.createElement('label');
-                lbl.id = 'privacy-label';
-                lbl.style.cssText = 'display:flex;gap:12px;align-items:flex-start;background:#1c1c1c;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:14px 16px;cursor:pointer;transition:border-color 0.2s;';
-                lbl.innerHTML =
-                    '<input type="checkbox" id="privacy-check" style="width:20px;height:20px;flex-shrink:0;margin-top:2px;accent-color:#25D366;cursor:pointer;">' +
-                    '<span style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6;">' +
-                    'Ho letto e accetto la <a href="/privacy-policy.php" target="_blank" style="color:#E8D5B7;text-decoration:underline;">Privacy Policy</a>. ' +
-                    'Acconsento al trattamento dei dati per essere ricontattato in merito alla mia ricerca auto.' +
-                    '</span>';
-                wrap.appendChild(lbl);
-
-                // Bottone invio
-                var btnInvia = document.createElement('button');
-                btnInvia.style.cssText = 'display:block;width:100%;background:#25D366;color:#000;border:none;border-radius:16px;padding:18px 20px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform 0.1s;';
-                btnInvia.textContent = '✓  Invia la mia ricerca';
-                btnInvia.onclick = function() { inviaLead(); };
-                btnInvia.onmousedown = function() { this.style.transform = 'scale(0.97)'; };
-                btnInvia.onmouseup   = function() { this.style.transform = 'scale(1)'; };
-                wrap.appendChild(btnInvia);
-
-                elChat.appendChild(wrap);
-                scrollGiu();
-            }
-        );
+  async function runStep2B() {
+    updateProgress(2);
+    await addBubble('Che tipo di furgone?', 'system', 600);
+    renderOptions(['Furgonato', 'Cassonato', 'Gemellato con sponda', 'Pianalato', 'Coibentato', 'Indifferente'], function(val) {
+      addUserBubble(val);
+      state.answers.sottotipo = val;
+      if (val !== 'Indifferente') addChip(val);
+      saveState();
+      runStep3();
     });
-}
+  }
 
-// ================================================================
-// INVIO LEAD AL CRM
-// ================================================================
-function inviaLead() {
-    var check = document.getElementById('privacy-check');
-    if (!check || !check.checked) {
-        var lbl = document.getElementById('privacy-label');
-        if (lbl) {
-            lbl.style.borderColor = '#f87171';
-            setTimeout(function() { lbl.style.borderColor = 'rgba(255,255,255,0.12)'; }, 1600);
-        }
-        return;
-    }
-
-    rimuoviBottoni();
-    stato.completato = true;
-    salvaStato();
-
-    // Separa nome e cognome (split naive sul primo spazio)
-    var parti      = (stato.nome || '').trim().split(/\s+/);
-    var nomeVal    = parti[0] || '';
-    var cognomeVal = parti.slice(1).join(' ') || '';
-
-    // Concatena le preferenze nel campo interesse
-    var interesse = [
-        'Tipo: '         + (stato.tipo_auto     || '-'),
-        'Alimentazione: '+ (stato.alimentazione || '-'),
-        'Cambio: '       + (stato.cambio        || '-'),
-        'Budget: '       + (stato.budget        || '-'),
-        'Km max: '       + (stato.km_max        || '-'),
-        'Tempistica: '   + (stato.tempistica    || '-')
-    ].join(' | ');
-
-    var payload = {
-        nome:            nomeVal,
-        cognome:         cognomeVal,
-        telefono:        stato.telefono,
-        email:           stato.email,
-        interesse:       interesse,
-        fonte:           'landing-chat',
-        id_concessionaria: 1,
-        note:            ''
-    };
-
-    // Feedback visivo immediato
-    mostraTyping(function() {
-        aggiungiBubble('Ricevuto! 🔍 Sto elaborando la tua ricerca...', 'sinistra');
+  async function runStep3() {
+    updateProgress(3);
+    await addBubble('Alimentazione preferita?', 'system', 600);
+    renderOptions(['Benzina', 'Diesel', 'Ibrida', 'Elettrica', 'Indifferente'], function(val) {
+      addUserBubble(val);
+      state.answers.alimentazione = val;
+      if (val !== 'Indifferente') addChip(val);
+      saveState();
+      runStep4();
     });
+  }
 
-    fetch(API_ENDPOINT, {
-        method:  'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-G83-Token':  API_TOKEN
-        },
-        body: JSON.stringify(payload)
-    })
-    .then(function(r) { return r.json(); })
-    .then(function() { mostraSuccesso(); })
-    .catch(function() { mostraSuccesso(); }); // Mostra sempre il messaggio di conferma
-}
+  async function runStep4() {
+    updateProgress(4);
+    await addBubble('Cambio?', 'system', 600);
+    renderOptions(['Manuale', 'Automatico', 'Indifferente'], function(val) {
+      addUserBubble(val);
+      state.answers.cambio = val;
+      if (val !== 'Indifferente') addChip(val);
+      saveState();
+      runStep5();
+    });
+  }
 
-// ================================================================
-// MESSAGGIO DI SUCCESSO FINALE
-// ================================================================
-function mostraSuccesso() {
-    pulisciStato();
+  async function runStep5() {
+    updateProgress(5);
+    await addBubble('Budget?', 'system', 600);
+    renderOptions(['Fino a 10k', '10-20k', '20-30k', 'Oltre 30k'], function(val) {
+      addUserBubble(val);
+      state.answers.budget = val;
+      addChip(val);
+      saveState();
+      runStep6();
+    });
+  }
 
-    var primoNome = stato.nome ? stato.nome.split(/\s+/)[0] : '';
+  async function runStep6() {
+    updateProgress(6);
+    await addBubble('Km massimi?', 'system', 600);
+    renderOptions(['Fino a 50.000', '50-100.000', '100-150.000', 'Indifferente'], function(val) {
+      addUserBubble(val);
+      state.answers.km = val;
+      if (val !== 'Indifferente') addChip(val);
+      saveState();
+      runStep7();
+    });
+  }
 
-    setTimeout(function() {
-        mostraTyping(function() {
-            aggiungiBubble(
-                'Perfetto' + (primoNome ? ', <strong>' + primoNome + '</strong>' : '') + '! 🎉 ' +
-                'Abbiamo ricevuto la tua richiesta. Un nostro consulente ti contatterà su WhatsApp ' +
-                'al numero che ci hai lasciato <strong>entro 30 minuti</strong> per mostrarti le auto perfette per te.',
-                'sinistra',
-                function() {
-                    var nota = document.createElement('div');
-                    nota.className = 'bubble-in';
-                    nota.style.cssText = 'text-align:center;padding:10px 12px 20px;font-size:12px;color:#555;';
-                    nota.textContent = 'Nel frattempo controlla che WhatsApp sia attivo sul tuo telefono.';
-                    elChat.appendChild(nota);
-                    scrollGiu();
-                }
-            );
-        });
-    }, 600);
-}
+  async function runStep7() {
+    updateProgress(7);
+    await addBubble('Quando vorresti l\'auto?', 'system', 600);
+    renderOptions(['Subito', 'Entro 1 mese', 'Entro 3 mesi', 'Sto solo guardando'], function(val) {
+      addUserBubble(val);
+      state.answers.tempistica = val;
+      addChip(val);
+      saveState();
+      runStep8();
+    });
+  }
 
-// ================================================================
-// AVVIO — controlla localStorage e parte
-// ================================================================
-function avvia() {
-    caricaContatore();
+  async function runStep8() {
+    updateProgress(8);
+    await addBubble('Come ti chiami?', 'system', 600);
+    renderInput('text', 'Il tuo nome...', function(val) {
+      if (!val) { return false; }
+      addUserBubble(val);
+      state.answers.nome = val;
+      saveState();
+      runStep9();
+      return true;
+    });
+  }
 
-    var salvato = caricaStato();
+  async function runStep9() {
+    updateProgress(9);
+    await addBubble('Numero WhatsApp?', 'system', 600);
+    renderInput('tel', 'Es. 333 1234567', function(val) {
+      const clean = val.replace(/\s/g, '');
+      if (!/^\+?[0-9]{10,13}$/.test(clean)) {
+        return false;
+      }
+      addUserBubble(val);
+      state.answers.telefono = clean;
+      saveState();
+      runStep10();
+      return true;
+    });
+  }
 
-    // Ripristino da localStorage se l'utente era a metà
-    if (salvato && !salvato.completato && salvato.step > 0 && salvato.step < STEPS.length) {
-        stato = salvato;
+  async function runStep10() {
+    updateProgress(9);
+    await addBubble('Email? (opzionale)', 'system', 600);
+    renderInput('email', 'La tua email...', function(val) {
+      if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+        return false;
+      }
+      if (val) addUserBubble(val);
+      state.answers.email = val;
+      saveState();
+      runPrivacy();
+      return true;
+    }, true);
+  }
 
-        mostraTyping(function() {
-            aggiungiBubble(
-                'Bentornato! 👋 Ho salvato la tua ricerca precedente. Continuiamo da dove ci siamo fermati.',
-                'sinistra',
-                function() {
-                    aggiornaRiepilogo();
-                    eseguiStep(stato.step);
-                }
-            );
-        });
-        return;
+  async function runPrivacy() {
+    await addBubble('Quasi fatto! Prima di inviarti le offerte, ho bisogno del tuo consenso.', 'system', 700);
+    renderPrivacy(function() {
+      runFinale();
+    });
+  }
+
+  async function runFinale() {
+    submitCRM();
+    state.done = true;
+    saveState();
+
+    updateProgress(9);
+    await addBubble('Ricevuto! 🔍 Sto elaborando la tua ricerca...', 'system', 600);
+    await addBubble(
+      'Perfetto, ' + (state.answers.nome || 'amico') + '! 🎉 Abbiamo ricevuto la tua richiesta. Un nostro consulente ti contatterà su WhatsApp al numero che ci hai lasciato entro 30 minuti per mostrarti le auto perfette per te.',
+      'system',
+      1200
+    );
+
+    const subMsg = document.createElement('p');
+    subMsg.className = 'ai-final-msg';
+    subMsg.textContent = 'Nel frattempo controlla che WhatsApp sia attivo sul tuo telefono.';
+    chatEl.appendChild(subMsg);
+    scrollChat();
+
+    localStorage.removeItem(LS_KEY);
+  }
+
+  // ─── INIT ────────────────────────────────────────────────────
+  function init() {
+    renderChips();
+    updateProgress(state.step);
+
+    if (state.done) {
+      runFinale();
+      return;
     }
 
-    // Avvio fresh
-    pulisciStato();
-    stato.step = 0;
+    // fresh start
+    runIntro();
+  }
 
-    mostraTyping(function() {
-        aggiungiBubble(
-            'Ciao! 👋 Sono il tuo consulente auto virtuale di <strong>Autoideale</strong>.',
-            'sinistra',
-            function() {
-                mostraTyping(function() {
-                    aggiungiBubble(
-                        'Ti aiuto a trovare la tua auto ideale in meno di 60 secondi, gratis.',
-                        'sinistra',
-                        function() {
-                            eseguiStep(0);
-                        }
-                    );
-                });
-            }
-        );
-    });
-}
+  init();
 
-// Avvio al caricamento pagina
-avvia();
+})();
 </script>
+</body>
 
-<!--
-================================================================
-SCHEMA MARKUP AutoDealer — decommenta e personalizza prima del go-live
-================================================================
+<!-- ===== SCHEMA MARKUP AutoDealer (JSON-LD) =====
+     Attiva rimuovendo i commenti <!-- e --> intorno al tag <script>
+     Aggiorna i campi: name, url, telephone, address, areaServed
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "AutoDealer",
-  "name": "AutoIdeale.it",
-  "url": "https://autoideale.it",
-  "description": "Trova la tua auto ideale in 60 secondi. Servizio gratuito di matching auto usate con concessionarie partner.",
-  "email": "info@autoideale.it",
-  "areaServed": {
-    "@type": "Country",
-    "name": "Italy"
+  "name": "Autoideale",
+  "url": "https://TUODOMINIO.it",
+  "telephone": "+39-000-0000000",
+  "image": "https://TUODOMINIO.it/images/og-autoideale.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Via Esempio 1",
+    "addressLocality": "Milano",
+    "postalCode": "20100",
+    "addressCountry": "IT"
   },
-  "sameAs": []
+  "areaServed": "IT",
+  "priceRange": "€€",
+  "description": "Consulente AI per trovare auto e furgoni usati. Ricevi le migliori offerte su WhatsApp in 30 minuti."
 }
 </script>
--->
+===== FINE SCHEMA AutoDealer ===== -->
 
-</body>
 </html>
